@@ -46,8 +46,6 @@ public class AtRequestor extends ActiveTickServerRequester {
 
 	@Override
 	public void OnBarHistoryDbResponse(long requestId, ATBarHistoryResponseType responseType, Vector<ATServerAPIDefines.ATBARHISTORY_RECORD> recordList) {
-		log.info("requestId=" + requestId);
-		log.info("responseType=" + AtHelper.toString(responseType));
 
 		// Assumption: all candles are 1 minute bars
 

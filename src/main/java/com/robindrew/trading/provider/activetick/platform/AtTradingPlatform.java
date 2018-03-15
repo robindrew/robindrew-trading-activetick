@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import com.robindrew.common.util.Check;
 import com.robindrew.trading.IInstrument;
 import com.robindrew.trading.platform.streaming.IStreamingService;
 import com.robindrew.trading.position.IPosition;
@@ -12,13 +13,20 @@ import com.robindrew.trading.position.closed.IClosedPosition;
 import com.robindrew.trading.position.order.IPositionOrder;
 import com.robindrew.trading.price.history.IHistoryService;
 import com.robindrew.trading.price.precision.IPricePrecision;
+import com.robindrew.trading.provider.activetick.platform.history.AtHistoryService;
 import com.robindrew.trading.trade.funds.AccountFunds;
 
 public class AtTradingPlatform implements IAtTradingPlatform {
 
+	private final AtHistoryService history;
+
+	public AtTradingPlatform(AtHistoryService history) {
+		this.history = Check.notNull("history", history);
+	}
+
 	@Override
 	public IHistoryService getHistoryService() {
-		throw new UnsupportedOperationException();
+		return history;
 	}
 
 	@Override

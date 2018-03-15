@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.robindrew.common.util.Check;
 import com.robindrew.common.util.Java;
 import com.robindrew.common.util.Threads;
 import com.robindrew.trading.IInstrument;
@@ -95,13 +96,24 @@ public class AtConnection implements AutoCloseable {
 	}
 
 	public List<IPriceCandle> getPriceHistory(IInstrument instrument, LocalDateTime from, LocalDateTime to) {
+		return getPriceHistory(instrument, from, to, 1);
+	}
+
+	public List<IPriceCandle> getPriceHistory(IInstrument instrument, LocalDateTime from, LocalDateTime to, int intervalInMinutes) {
+		if (intervalInMinutes < 1) {
+			throw new IllegalArgumentException("intervalInMinutes=" + intervalInMinutes);
+		}
+
+		Check.notNull("instrument", instrument);
+		Check.notNull("from", from);
+		Check.notNull("to", to);
+
 		log.info("[GetHistory] Instrument: " + instrument);
 		log.info("[GetHistory] FromDate: " + from);
 		log.info("[GetHistory] ToDate: " + to);
 
 		// Instrument
 		ATSYMBOL symbol = Helpers.StringToSymbol(instrument.getName());
-		short minutes = 1;
 
 		// Dates
 		SYSTEMTIME fromDate = AtHelper.toSystemTime(from);
@@ -109,11 +121,16 @@ public class AtConnection implements AutoCloseable {
 
 		ATBarHistoryType barHistoryType = AtHelper.newBarHistoryType();
 
-		long requestId = requestor.SendATBarHistoryDbRequest(symbol, barHistoryType, minutes, fromDate, toDate, DEFAULT_REQUEST_TIMEOUT);
+		long requestId = requestor.SendATBarHistoryDbRequest(symbol, barHistoryType, (short) intervalInMinutes, fromDate, toDate, DEFAULT_REQUEST_TIMEOUT);
 		AtHelper.throwError(requestId);
 		log.info("[GetHistory] RequestId: {}", requestId);
 
 		List<IPriceCandle> candles = requestor.getResponse(requestId);
+		log.info("[GetHistory] {} Price Candles", candles.size());
+		if (!candles.isEmpty()) {
+			log.info("[GetHistory] First: {}", candles.get(0));
+			log.info("[GetHistory] Last: {}", candles.get(candles.size() - 1));
+		}
 		return candles;
 	}
 
