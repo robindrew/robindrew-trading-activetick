@@ -1,9 +1,12 @@
 package com.robindrew.trading.provider.activetick.platform;
 
 import static at.feedapi.ActiveTickServerAPI.DEFAULT_REQUEST_TIMEOUT;
+import static at.shared.ATServerAPIDefines.ATStreamRequestType.StreamRequestSubscribe;
 import static com.robindrew.common.util.Check.notNull;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -27,10 +30,12 @@ import at.feedapi.ATCallback.ATSessionStatusChangeCallback;
 import at.feedapi.ActiveTickServerAPI;
 import at.feedapi.Helpers;
 import at.feedapi.Session;
+import at.shared.ATServerAPIDefines;
 import at.shared.ATServerAPIDefines.ATBarHistoryType;
 import at.shared.ATServerAPIDefines.ATLOGIN_RESPONSE;
 import at.shared.ATServerAPIDefines.ATSYMBOL;
 import at.shared.ATServerAPIDefines.ATSessionStatusType;
+import at.shared.ATServerAPIDefines.ATStreamRequestType;
 import at.shared.ATServerAPIDefines.SYSTEMTIME;
 import at.utils.jlib.Errors;
 
@@ -93,6 +98,28 @@ public class AtConnection implements AutoCloseable {
 			session = null;
 		}
 		api.ATShutdownAPI();
+	}
+
+	public void subscribe(IInstrument... instruments) {
+		subscribe(Arrays.asList(instruments));
+	}
+
+	public void subscribe(Collection<? extends IInstrument> instruments) {
+
+		for (IInstrument instrument : instruments) {
+			log.info("[Subscribe] Instrument: {}", instrument);
+		}
+
+		// Instruments to subscribe for
+		List<ATSYMBOL> symbols = AtHelper.toSymbolList(instruments);
+
+		// Subscribe
+		ATStreamRequestType requestType = (new ATServerAPIDefines()).new ATStreamRequestType();
+		requestType.m_streamRequestType = StreamRequestSubscribe;
+
+		long requestId = requestor.SendATQuoteStreamRequest(symbols, requestType, DEFAULT_REQUEST_TIMEOUT);
+		AtHelper.throwError(requestId);
+		log.info("[Subscribe] RequestId: {}", requestId);
 	}
 
 	public List<IPriceCandle> getPriceHistory(IInstrument instrument, LocalDateTime from, LocalDateTime to) {

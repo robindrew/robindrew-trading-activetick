@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.robindrew.common.util.SystemProperties;
+import com.robindrew.common.util.Threads;
 import com.robindrew.trading.IInstrument;
 import com.robindrew.trading.price.candle.IPriceCandle;
 import com.robindrew.trading.price.candle.format.pcf.PcfFormat;
@@ -23,6 +24,23 @@ public class ActiveTickTests {
 	private static final Logger log = LoggerFactory.getLogger(ActiveTickTests.class);
 
 	@Test
+	public void subscribeTest() {
+
+		String apiKey = SystemProperties.get("apiKey", false);
+		String username = SystemProperties.get("username", false);
+		String password = SystemProperties.get("password", false);
+
+		AtCredentials credentials = new AtCredentials(apiKey, username, password);
+		try (AtConnection connector = new AtConnection(credentials)) {
+			connector.connect();
+			connector.login();
+			
+			connector.subscribe(AtInstrument.USD_JPY);
+			Threads.sleepForever();
+		}
+	}
+
+	// @Test
 	public void historyDownloadTest() {
 
 		String apiKey = SystemProperties.get("apiKey", false);

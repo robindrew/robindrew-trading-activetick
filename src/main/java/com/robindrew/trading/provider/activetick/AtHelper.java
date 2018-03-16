@@ -20,17 +20,77 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import com.robindrew.common.date.Dates;
+import com.robindrew.trading.IInstrument;
+
+import at.feedapi.Helpers;
 import at.shared.ATServerAPIDefines;
 import at.shared.ATServerAPIDefines.ATBarHistoryResponseType;
 import at.shared.ATServerAPIDefines.ATBarHistoryType;
 import at.shared.ATServerAPIDefines.ATLOGIN_RESPONSE;
 import at.shared.ATServerAPIDefines.ATLoginResponseType;
+import at.shared.ATServerAPIDefines.ATPRICE;
+import at.shared.ATServerAPIDefines.ATSYMBOL;
 import at.shared.ATServerAPIDefines.ATSessionStatusType;
 import at.shared.ATServerAPIDefines.SYSTEMTIME;
 import at.utils.jlib.Errors;
 
 public class AtHelper {
+
+	public static final ZoneId zoneId = ZoneId.of("America/New_York");
+
+	public static LocalDateTime toUTC(LocalDateTime date) {
+		return Dates.convertDateTime(date, zoneId, Dates.UTC_ZONE);
+	}
+
+	public static LocalDateTime fromUTC(LocalDateTime date) {
+		return Dates.convertDateTime(date, Dates.UTC_ZONE, zoneId);
+	}
+
+	public static String toString(ATServerAPIDefines.ATQUOTESTREAM_QUOTE_UPDATE update) {
+		ToStringBuilder text = new ToStringBuilder(update, ToStringStyle.SHORT_PREFIX_STYLE);
+		text.append("symbol", new String(update.symbol.symbol).trim());
+		text.append("date", toLocalDateTime(update.quoteDateTime));
+		if (update.bidSize > 0) {
+			text.append("bidSize", update.bidSize);
+		}
+		if (update.askSize > 0) {
+			text.append("askSize", update.askSize);
+		}
+		text.append("bidPrice", update.bidPrice.price);
+		text.append("bidPrecision", update.bidPrice.precision);
+		text.append("askPrice", update.askPrice.price);
+		text.append("askPrecision", update.askPrice.precision);
+		return text.toString();
+	}
+
+	public static ATSYMBOL toSymbol(IInstrument instrument) {
+		return toSymbol(instrument.getName());
+	}
+
+	public static ATSYMBOL toSymbol(String symbol) {
+		return Helpers.StringToSymbol(symbol);
+	}
+
+	public static List<ATSYMBOL> toSymbolList(Collection<? extends IInstrument> instruments) {
+		List<ATSYMBOL> symbols = new ArrayList<ATSYMBOL>();
+		for (IInstrument instrument : instruments) {
+			symbols.add(toSymbol(instrument));
+		}
+		return symbols;
+	}
+
+	public static int toBigInt(ATPRICE price) {
+		return toBigInt(price.price, price.precision);
+	}
 
 	public static int toBigInt(double price, int precision) {
 		BigDecimal decimal = new BigDecimal(price);
@@ -40,7 +100,8 @@ public class AtHelper {
 	}
 
 	public static LocalDateTime toLocalDateTime(SYSTEMTIME time) {
-		return LocalDateTime.of(time.year, time.month, time.day, time.hour, time.minute, time.second, time.milliseconds);
+		LocalDateTime date = LocalDateTime.of(time.year, time.month, time.day, time.hour, time.minute, time.second, time.milliseconds);
+		return toUTC(date);
 	}
 
 	public static ATBarHistoryType newBarHistoryType() {
@@ -52,6 +113,8 @@ public class AtHelper {
 	}
 
 	public static SYSTEMTIME toSystemTime(LocalDateTime date) {
+		date = fromUTC(date);
+
 		SYSTEMTIME time = new ATServerAPIDefines().new SYSTEMTIME();
 		time.year = (short) date.getYear();
 		time.month = (short) date.getMonthValue();
