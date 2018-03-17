@@ -1,6 +1,8 @@
 package com.robindrew.trading.provider.activetick;
 
-public class AtException extends RuntimeException {
+import com.robindrew.trading.TradingException;
+
+public class AtException extends TradingException {
 
 	private static final long serialVersionUID = -4813398872671246225L;
 

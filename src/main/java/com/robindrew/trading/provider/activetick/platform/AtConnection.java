@@ -60,6 +60,11 @@ public class AtConnection implements AutoCloseable {
 	}
 
 	public void connect() {
+		connect(DEFAULT_HOST, DEFAULT_PORT);
+	}
+
+	public void connect(String host, int port) {
+		log.info("[Connect] {}:{}", host, port);
 
 		// Initialise the API
 		api.ATInitAPI();
