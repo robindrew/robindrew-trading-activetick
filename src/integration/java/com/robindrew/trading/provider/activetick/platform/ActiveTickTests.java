@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.robindrew.common.util.SystemProperties;
 import com.robindrew.common.util.Threads;
 import com.robindrew.trading.IInstrument;
+import com.robindrew.trading.Instruments;
 import com.robindrew.trading.price.candle.IPriceCandle;
 import com.robindrew.trading.price.candle.format.pcf.PcfFormat;
 import com.robindrew.trading.price.candle.format.pcf.source.file.IPcfFile;
@@ -23,54 +24,61 @@ public class ActiveTickTests {
 
 	private static final Logger log = LoggerFactory.getLogger(ActiveTickTests.class);
 
-	@Test
+	// @Test
 	public void subscribeTest() {
 
 		String apiKey = SystemProperties.get("apiKey", false);
 		String username = SystemProperties.get("username", false);
 		String password = SystemProperties.get("password", false);
 
+		IInstrument instrument = Instruments.valueOf(SystemProperties.get("instrument", false));
+
 		AtCredentials credentials = new AtCredentials(apiKey, username, password);
 		try (AtConnection connector = new AtConnection(credentials)) {
 			connector.connect();
 			connector.login();
-			
-			connector.subscribe(AtInstrument.USD_JPY);
+
+			connector.subscribe(instrument);
 			Threads.sleepForever();
 		}
 	}
 
-	// @Test
+	@Test
 	public void historyDownloadTest() {
 
 		String apiKey = SystemProperties.get("apiKey", false);
 		String username = SystemProperties.get("username", false);
 		String password = SystemProperties.get("password", false);
 
-		File directory = new File("C:\\development\\repository\\git\\robindrew-public\\robindrew-trading-data\\data\\pcf\\ACTIVETICK\\CURRENCIES\\USDJPY");
+		File directory = new File(SystemProperties.get("directory", false));
 
 		AtCredentials credentials = new AtCredentials(apiKey, username, password);
 		try (AtConnection connector = new AtConnection(credentials)) {
 			connector.connect();
 			connector.login();
 
-			IInstrument instrument = AtInstrument.USD_JPY;
+			for (IInstrument instrument : AtInstrument.values()) {
+				File instrumentDir = new File(directory, instrument.getUnderlying(true).getName());
+				instrumentDir.mkdir();
+				LocalDateTime date = getDate();
 
-			LocalDateTime date = getDate();
+				while (true) {
 
-			while (true) {
-				List<IPriceCandle> candles = getPriceHistory(connector, instrument, date);
-				if (candles.isEmpty()) {
-					break;
+					LocalDate month = date.toLocalDate();
+					String filename = PcfFormat.getFilename(month);
+					IPcfFile file = new PcfFile(new File(instrumentDir, filename), month);
+					if (file.exists()) {
+						log.warn("Skipping existing file: " + file.getMonth());
+					} else {
+
+						List<IPriceCandle> candles = getPriceHistory(connector, instrument, date);
+						if (candles.isEmpty()) {
+							break;
+						}
+						file.write(candles);
+					}
+					date = date.minusMonths(1);
 				}
-
-				LocalDate month = date.toLocalDate();
-				String filename = PcfFormat.getFilename(month);
-
-				IPcfFile file = new PcfFile(new File(directory, filename), month);
-				file.write(candles);
-
-				date = date.minusMonths(1);
 			}
 		}
 	}
@@ -78,7 +86,6 @@ public class ActiveTickTests {
 	private List<IPriceCandle> getPriceHistory(AtConnection connector, IInstrument instrument, LocalDateTime date) {
 		List<IPriceCandle> monthList = new ArrayList<>();
 
-		LocalDateTime fromMonth = date;
 		LocalDateTime toMonth = date.plusMonths(1);
 
 		LocalDateTime fromDay = date;

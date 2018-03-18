@@ -7,6 +7,7 @@ import static com.robindrew.common.util.Check.notNull;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -15,11 +16,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Stopwatch;
 import com.robindrew.common.util.Check;
 import com.robindrew.common.util.Java;
 import com.robindrew.common.util.Threads;
 import com.robindrew.trading.IInstrument;
 import com.robindrew.trading.price.candle.IPriceCandle;
+import com.robindrew.trading.price.candle.PriceCandles;
 import com.robindrew.trading.provider.activetick.AtException;
 import com.robindrew.trading.provider.activetick.AtHelper;
 
@@ -153,17 +156,49 @@ public class AtConnection implements AutoCloseable {
 
 		ATBarHistoryType barHistoryType = AtHelper.newBarHistoryType();
 
+		Stopwatch timer = Stopwatch.createStarted();
 		long requestId = requestor.SendATBarHistoryDbRequest(symbol, barHistoryType, (short) intervalInMinutes, fromDate, toDate, DEFAULT_REQUEST_TIMEOUT);
 		AtHelper.throwError(requestId);
 		log.info("[GetHistory] RequestId: {}", requestId);
 
 		List<IPriceCandle> candles = requestor.getResponse(requestId);
-		log.info("[GetHistory] {} Price Candles", candles.size());
+		candles = mergeCandles(candles);
+		timer.stop();
+		log.info("[GetHistory] {} Price Candles in {}", candles.size(), timer);
 		if (!candles.isEmpty()) {
 			log.info("[GetHistory] First: {}", candles.get(0));
 			log.info("[GetHistory] Last: {}", candles.get(candles.size() - 1));
 		}
 		return candles;
+	}
+
+	private List<IPriceCandle> mergeCandles(List<IPriceCandle> candles) {
+		LinkedList<IPriceCandle> mergeList = new LinkedList<>();
+		IPriceCandle previous = null;
+		for (IPriceCandle next : candles) {
+
+			if (previous == null) {
+				mergeList.add(next);
+				previous = next;
+				continue;
+			}
+
+			if (previous.getCloseTime() < next.getOpenTime()) {
+				mergeList.add(next);
+				previous = next;
+				continue;
+			}
+
+			if (previous.getOpenTime() == next.getOpenTime()) {
+				IPriceCandle merged = PriceCandles.merge(previous, next);
+				mergeList.removeLast();
+				mergeList.addLast(merged);
+				previous = merged;
+			} else {
+				log.warn("[Invalid Price Candle] previous={}, next={}", previous, next);
+			}
+		}
+		return mergeList;
 	}
 
 	public void login() {

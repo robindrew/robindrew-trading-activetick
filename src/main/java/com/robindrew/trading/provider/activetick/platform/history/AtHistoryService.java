@@ -18,8 +18,8 @@ public class AtHistoryService implements IHistoryService {
 	}
 
 	@Override
-	public Set<IInstrument> getInstruments() {
-		return AtInstrument.getAll();
+	public Set<? extends IInstrument> getInstruments() {
+		return AtInstrument.values();
 	}
 
 	@Override
