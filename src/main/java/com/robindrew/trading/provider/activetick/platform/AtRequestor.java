@@ -36,7 +36,7 @@ public class AtRequestor extends ActiveTickServerRequester {
 	@SuppressWarnings("unchecked")
 	public <V> V getResponse(long requestId) {
 		while (true) {
-			Object response = responseMap.get(requestId);
+			Object response = responseMap.remove(requestId);
 			if (response != null) {
 				return (V) response;
 			}
