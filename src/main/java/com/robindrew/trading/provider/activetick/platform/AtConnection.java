@@ -161,7 +161,7 @@ public class AtConnection implements AutoCloseable {
 		AtHelper.throwError(requestId);
 		log.info("[GetHistory] RequestId: {}", requestId);
 
-		List<IPriceCandle> candles = requestor.getResponse(requestId);
+		List<IPriceCandle> candles = requestor.awaitResponse(requestId);
 		candles = mergeCandles(candles);
 		timer.stop();
 		log.info("[GetHistory] {} Price Candles in {}", candles.size(), timer);
