@@ -24,7 +24,7 @@ public class AtStreamingService extends StreamingService {
 		super.registerStream(stream);
 
 		// Subscribe
-		connection.getStreamListener().register(stream.getListener());
+		connection.getStreamListener().register(stream);
 		connection.subscribe(stream.getInstrument());
 	}
 

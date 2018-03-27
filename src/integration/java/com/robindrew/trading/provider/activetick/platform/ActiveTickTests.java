@@ -19,7 +19,6 @@ import com.robindrew.trading.price.candle.format.pcf.PcfFormat;
 import com.robindrew.trading.price.candle.format.pcf.source.file.IPcfFile;
 import com.robindrew.trading.price.candle.format.pcf.source.file.PcfFile;
 import com.robindrew.trading.provider.activetick.platform.streaming.AtInstrumentPriceStream;
-import com.robindrew.trading.provider.activetick.platform.streaming.AtInstrumentPriceStreamListener;
 import com.robindrew.trading.provider.activetick.platform.streaming.AtStreamingService;
 
 public class ActiveTickTests {

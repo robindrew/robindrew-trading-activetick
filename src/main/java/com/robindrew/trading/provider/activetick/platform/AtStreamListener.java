@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.robindrew.trading.IInstrument;
+import com.robindrew.trading.platform.streaming.IInstrumentPriceStream;
 import com.robindrew.trading.price.candle.IPriceCandle;
-import com.robindrew.trading.price.candle.io.stream.sink.subscriber.IInstrumentPriceStreamListener;
 import com.robindrew.trading.provider.activetick.AtHelper;
 import com.robindrew.trading.provider.activetick.AtQuote;
 
@@ -23,7 +23,7 @@ public class AtStreamListener extends ActiveTickStreamListener implements Runnab
 
 	private static final Logger log = LoggerFactory.getLogger(AtStreamListener.class);
 
-	private final Map<IInstrument, IInstrumentPriceStreamListener> listenerMap = new ConcurrentHashMap<>();
+	private final Map<IInstrument, IInstrumentPriceStream> listenerMap = new ConcurrentHashMap<>();
 	private final BlockingDeque<AtQuote> quoteQueue = new LinkedBlockingDeque<>();
 	private final Thread thread;
 	private final AtomicBoolean closed = new AtomicBoolean(false);
@@ -48,10 +48,10 @@ public class AtStreamListener extends ActiveTickStreamListener implements Runnab
 		}
 	}
 
-	public void register(IInstrumentPriceStreamListener listener) {
-		IInstrument instrument = listener.getInstrument();
+	public void register(IInstrumentPriceStream stream) {
+		IInstrument instrument = stream.getInstrument();
 		instrument = instrument.getUnderlying(true);
-		listenerMap.put(instrument, listener);
+		listenerMap.put(instrument, stream);
 	}
 
 	public boolean isClosed() {
@@ -66,10 +66,10 @@ public class AtStreamListener extends ActiveTickStreamListener implements Runnab
 
 				IInstrument instrument = quote.getInstrument();
 				instrument = instrument.getUnderlying(true);
-				IInstrumentPriceStreamListener listener = listenerMap.get(instrument);
-				if (listener != null) {
+				IInstrumentPriceStream priceStream = listenerMap.get(instrument);
+				if (priceStream != null) {
 					IPriceCandle candle = quote.getCandle();
-					listener.putNextCandle(candle);
+					priceStream.putNextCandle(candle);
 				}
 			}
 		} catch (InterruptedException e) {
