@@ -9,9 +9,6 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.robindrew.common.util.Threads;
 import com.robindrew.trading.price.candle.IPriceCandle;
 import com.robindrew.trading.price.candle.PriceCandle;
@@ -24,8 +21,6 @@ import at.shared.ATServerAPIDefines;
 import at.shared.ATServerAPIDefines.ATBarHistoryResponseType;
 
 public class AtRequestor extends ActiveTickServerRequester {
-
-	private static final Logger log = LoggerFactory.getLogger(AtRequestor.class);
 
 	private final Map<Long, Object> responseMap = new ConcurrentHashMap<>();
 

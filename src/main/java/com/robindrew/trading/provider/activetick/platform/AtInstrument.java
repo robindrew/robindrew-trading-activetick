@@ -45,6 +45,9 @@ public class AtInstrument extends Instrument {
 				return instrument;
 			}
 		}
+		if (!text.startsWith("#")) {
+			return valueOf("#" + text);
+		}
 		throw new IllegalArgumentException("text: " + text);
 	}
 

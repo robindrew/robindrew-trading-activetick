@@ -14,36 +14,41 @@ import org.slf4j.LoggerFactory;
 import com.robindrew.common.util.SystemProperties;
 import com.robindrew.common.util.Threads;
 import com.robindrew.trading.IInstrument;
-import com.robindrew.trading.Instruments;
 import com.robindrew.trading.price.candle.IPriceCandle;
 import com.robindrew.trading.price.candle.format.pcf.PcfFormat;
 import com.robindrew.trading.price.candle.format.pcf.source.file.IPcfFile;
 import com.robindrew.trading.price.candle.format.pcf.source.file.PcfFile;
+import com.robindrew.trading.provider.activetick.platform.streaming.AtInstrumentPriceStream;
+import com.robindrew.trading.provider.activetick.platform.streaming.AtInstrumentPriceStreamListener;
+import com.robindrew.trading.provider.activetick.platform.streaming.AtStreamingService;
 
 public class ActiveTickTests {
 
 	private static final Logger log = LoggerFactory.getLogger(ActiveTickTests.class);
 
-	// @Test
+	@Test
 	public void subscribeTest() {
 
 		String apiKey = SystemProperties.get("apiKey", false);
 		String username = SystemProperties.get("username", false);
 		String password = SystemProperties.get("password", false);
 
-		IInstrument instrument = Instruments.valueOf(SystemProperties.get("instrument", false));
+		IInstrument instrument = AtInstrument.valueOf(SystemProperties.get("instrument", false));
 
 		AtCredentials credentials = new AtCredentials(apiKey, username, password);
-		try (AtConnection connector = new AtConnection(credentials)) {
-			connector.connect();
-			connector.login();
+		try (AtConnection connection = new AtConnection(credentials)) {
+			connection.connect();
+			connection.login();
 
-			connector.subscribe(instrument);
-			Threads.sleepForever();
+			try (AtStreamingService service = new AtStreamingService(connection)) {
+				AtInstrumentPriceStream stream = new AtInstrumentPriceStream(instrument);
+				service.register(stream);
+
+				Threads.sleepForever();
+			}
 		}
 	}
 
-	@Test
 	public void historyDownloadTest() {
 
 		String apiKey = SystemProperties.get("apiKey", false);

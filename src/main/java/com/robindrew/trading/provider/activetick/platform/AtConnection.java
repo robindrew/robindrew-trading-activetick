@@ -62,6 +62,10 @@ public class AtConnection implements AutoCloseable {
 		this.api = new ActiveTickServerAPI();
 	}
 
+	public AtStreamListener getStreamListener() {
+		return streamListener;
+	}
+
 	public void connect() {
 		connect(DEFAULT_HOST, DEFAULT_PORT);
 	}
@@ -92,6 +96,9 @@ public class AtConnection implements AutoCloseable {
 			throw new AtException("Failed to connect: " + status);
 		}
 
+		// Start listening to ticks
+		streamListener.start();
+		
 		log.info("[Version] {}", api.GetAPIVersionInformation());
 	}
 
