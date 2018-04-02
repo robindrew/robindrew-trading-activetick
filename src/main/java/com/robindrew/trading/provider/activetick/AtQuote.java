@@ -44,7 +44,6 @@ public class AtQuote {
 		// Calculate mid
 		double bid = update.bidPrice.price;
 		double ask = update.askPrice.price;
-		double mid = ((ask - bid) / 2.0) + bid;
 
 		// Calculate precision
 		int bidPrecision = update.bidPrice.precision;
@@ -52,8 +51,9 @@ public class AtQuote {
 		int decimalPlaces = (bidPrecision > askPrecision ? bidPrecision : askPrecision) + 1;
 
 		// Convert price
-		int price = AtHelper.toBigInt(mid, decimalPlaces);
-		PriceCandleInstant candle = new PriceCandleInstant(price, timestamp, decimalPlaces);
+		int bidPrice = AtHelper.toBigInt(bid, decimalPlaces);
+		int askPrice = AtHelper.toBigInt(ask, decimalPlaces);
+		PriceCandleInstant candle = new PriceCandleInstant(bidPrice, askPrice, timestamp, decimalPlaces);
 
 		return new AtQuote(instrument, candle);
 	}
