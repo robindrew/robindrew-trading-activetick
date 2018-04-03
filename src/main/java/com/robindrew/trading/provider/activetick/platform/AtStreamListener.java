@@ -68,7 +68,7 @@ public class AtStreamListener extends ActiveTickStreamListener implements Runnab
 				instrument = instrument.getUnderlying(true);
 				IInstrumentPriceStream priceStream = listenerMap.get(instrument);
 				if (priceStream != null) {
-					IPriceCandle candle = quote.getCandle();
+					IPriceCandle candle = quote.getTick();
 					priceStream.putNextCandle(candle);
 				}
 			}

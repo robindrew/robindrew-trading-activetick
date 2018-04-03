@@ -6,7 +6,7 @@ import java.util.List;
 import com.robindrew.common.util.Check;
 import com.robindrew.trading.IInstrument;
 import com.robindrew.trading.price.candle.IPriceCandle;
-import com.robindrew.trading.price.candle.interval.IPriceCandleInterval;
+import com.robindrew.trading.price.candle.interval.IPriceInterval;
 import com.robindrew.trading.price.candle.io.stream.source.IPriceCandleStreamSource;
 import com.robindrew.trading.price.candle.io.stream.source.PriceCandleListBackedStreamSource;
 import com.robindrew.trading.price.history.IInstrumentPriceHistory;
@@ -45,7 +45,7 @@ public class AtInstrumentPriceHistory implements IInstrumentPriceHistory {
 	}
 
 	@Override
-	public List<IPriceCandle> getLatestPrices(IPriceCandleInterval interval, int count) {
+	public List<IPriceCandle> getLatestPrices(IPriceInterval interval, int count) {
 		throw new UnsupportedOperationException();
 	}
 
