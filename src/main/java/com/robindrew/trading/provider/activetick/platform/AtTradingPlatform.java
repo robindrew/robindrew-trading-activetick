@@ -14,13 +14,16 @@ import com.robindrew.trading.position.order.IPositionOrder;
 import com.robindrew.trading.price.history.IHistoryService;
 import com.robindrew.trading.price.precision.IPricePrecision;
 import com.robindrew.trading.provider.activetick.platform.history.AtHistoryService;
+import com.robindrew.trading.provider.activetick.platform.streaming.AtStreamingService;
 import com.robindrew.trading.trade.funds.AccountFunds;
 
 public class AtTradingPlatform implements IAtTradingPlatform {
 
+	private final AtStreamingService streaming;
 	private final AtHistoryService history;
 
-	public AtTradingPlatform(AtHistoryService history) {
+	public AtTradingPlatform(AtStreamingService streaming, AtHistoryService history) {
+		this.streaming = Check.notNull("streaming", streaming);
 		this.history = Check.notNull("history", history);
 	}
 
@@ -31,7 +34,7 @@ public class AtTradingPlatform implements IAtTradingPlatform {
 
 	@Override
 	public IStreamingService getStreamingService() {
-		throw new UnsupportedOperationException();
+		return streaming;
 	}
 
 	@Override

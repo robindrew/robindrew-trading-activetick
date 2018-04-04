@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.robindrew.trading.IInstrument;
 import com.robindrew.trading.platform.streaming.IInstrumentPriceStream;
-import com.robindrew.trading.price.candle.IPriceCandle;
+import com.robindrew.trading.price.tick.IPriceTick;
 import com.robindrew.trading.provider.activetick.AtHelper;
 import com.robindrew.trading.provider.activetick.AtQuote;
 
@@ -68,8 +68,8 @@ public class AtStreamListener extends ActiveTickStreamListener implements Runnab
 				instrument = instrument.getUnderlying(true);
 				IInstrumentPriceStream priceStream = listenerMap.get(instrument);
 				if (priceStream != null) {
-					IPriceCandle candle = quote.getTick();
-					priceStream.putNextCandle(candle);
+					IPriceTick tick = quote.getTick();
+					priceStream.putNextTick(tick);
 				}
 			}
 		} catch (InterruptedException e) {
