@@ -36,7 +36,9 @@ public class AtStreamListener extends ActiveTickStreamListener implements Runnab
 
 	@Override
 	public void OnATStreamQuoteUpdate(ATServerAPIDefines.ATQUOTESTREAM_QUOTE_UPDATE update) {
-		log.info("[Tick] {}", AtHelper.toString(update));
+		if (log.isDebugEnabled()) {
+			log.debug("[Tick] {}", AtHelper.toString(update));
+		}
 
 		try {
 			AtQuote quote = AtQuote.create(update);
