@@ -18,6 +18,7 @@ import com.robindrew.trading.provider.activetick.AtQuote;
 import at.feedapi.ActiveTickStreamListener;
 import at.feedapi.Session;
 import at.shared.ATServerAPIDefines;
+import at.shared.ATServerAPIDefines.ATQUOTESTREAM_TRADE_UPDATE;
 
 public class AtStreamListener extends ActiveTickStreamListener implements Runnable, AutoCloseable {
 
@@ -32,6 +33,16 @@ public class AtStreamListener extends ActiveTickStreamListener implements Runnab
 		super(session, false);
 
 		this.thread = new Thread(this, "AtStreamListener");
+	}
+
+	@Override
+	public void OnATStreamRefreshUpdate(at.shared.ATServerAPIDefines.ATQUOTESTREAM_REFRESH_UPDATE update) {
+		// How do we want to handle refresh updates?
+	};
+
+	@Override
+	public void OnATStreamTradeUpdate(ATQUOTESTREAM_TRADE_UPDATE update) {
+		// How do we want to handle trade updates?
 	}
 
 	@Override
