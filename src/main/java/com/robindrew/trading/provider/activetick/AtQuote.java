@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.robindrew.common.date.Dates;
 import com.robindrew.common.util.Check;
-import com.robindrew.trading.price.tick.PriceTick;
+import com.robindrew.trading.price.candle.TickPriceCandle;
 import com.robindrew.trading.provider.activetick.platform.AtInstrument;
 
 import at.shared.ATServerAPIDefines.ATExchangeType;
@@ -53,15 +53,15 @@ public class AtQuote {
 		// Convert price
 		int bidPrice = AtHelper.toBigInt(bid, decimalPlaces);
 		int askPrice = AtHelper.toBigInt(ask, decimalPlaces);
-		PriceTick candle = new PriceTick(bidPrice, askPrice, timestamp, decimalPlaces);
+		TickPriceCandle candle = new TickPriceCandle(bidPrice, askPrice, timestamp, decimalPlaces);
 
 		return new AtQuote(instrument, candle);
 	}
 
 	private final AtInstrument instrument;
-	private final PriceTick tick;
+	private final TickPriceCandle tick;
 
-	public AtQuote(AtInstrument instrument, PriceTick tick) {
+	public AtQuote(AtInstrument instrument, TickPriceCandle tick) {
 		this.instrument = Check.notNull("instrument", instrument);
 		this.tick = Check.notNull("tick", tick);
 	}
@@ -70,7 +70,7 @@ public class AtQuote {
 		return instrument;
 	}
 
-	public PriceTick getTick() {
+	public TickPriceCandle getTick() {
 		return tick;
 	}
 }

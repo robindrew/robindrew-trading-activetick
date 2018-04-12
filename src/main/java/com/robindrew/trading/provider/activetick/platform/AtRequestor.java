@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.robindrew.common.util.Threads;
 import com.robindrew.trading.price.candle.IPriceCandle;
-import com.robindrew.trading.price.candle.PriceCandle;
+import com.robindrew.trading.price.candle.MidPriceCandle;
 import com.robindrew.trading.provider.activetick.AtHelper;
 
 import at.feedapi.ActiveTickServerAPI;
@@ -55,7 +55,7 @@ public class AtRequestor extends ActiveTickServerRequester {
 			LocalDateTime openTime = AtHelper.toLocalDateTime(record.barTime);
 			LocalDateTime closeTime = openTime.plusSeconds(59);
 
-			IPriceCandle candle = new PriceCandle(open, high, low, close, toMillis(openTime), toMillis(closeTime), 0);
+			IPriceCandle candle = new MidPriceCandle(open, high, low, close, toMillis(openTime), toMillis(closeTime), 0);
 			candles.add(candle);
 		}
 
