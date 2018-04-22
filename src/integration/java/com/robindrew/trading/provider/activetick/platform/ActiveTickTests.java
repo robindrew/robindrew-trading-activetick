@@ -18,7 +18,6 @@ import com.robindrew.trading.price.candle.IPriceCandle;
 import com.robindrew.trading.price.candle.format.pcf.PcfFormat;
 import com.robindrew.trading.price.candle.format.pcf.source.file.IPcfFile;
 import com.robindrew.trading.price.candle.format.pcf.source.file.PcfFile;
-import com.robindrew.trading.provider.activetick.platform.streaming.AtInstrumentPriceStream;
 import com.robindrew.trading.provider.activetick.platform.streaming.AtStreamingService;
 
 public class ActiveTickTests {
@@ -32,7 +31,7 @@ public class ActiveTickTests {
 		String username = SystemProperties.get("username", false);
 		String password = SystemProperties.get("password", false);
 
-		IInstrument instrument = AtInstrument.valueOf(SystemProperties.get("instrument", false));
+		AtInstrument instrument = AtInstrument.valueOf(SystemProperties.get("instrument", false));
 
 		AtCredentials credentials = new AtCredentials(apiKey, username, password);
 		try (AtConnection connection = new AtConnection(credentials)) {
@@ -40,8 +39,7 @@ public class ActiveTickTests {
 			connection.login();
 
 			try (AtStreamingService service = new AtStreamingService(connection)) {
-				AtInstrumentPriceStream stream = new AtInstrumentPriceStream(instrument);
-				service.register(stream);
+				service.subscribe(instrument);
 
 				Threads.sleepForever();
 			}

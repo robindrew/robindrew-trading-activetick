@@ -7,7 +7,7 @@ import com.robindrew.trading.IInstrument;
 import com.robindrew.trading.Instrument;
 import com.robindrew.trading.Instruments;
 
-public class AtInstrument extends Instrument {
+public class AtInstrument extends Instrument implements IAtInstrument {
 
 	/** AUD/USD. */
 	public static final AtInstrument AUD_USD = new AtInstrument("#AUD/USD", Instruments.AUD_USD);
