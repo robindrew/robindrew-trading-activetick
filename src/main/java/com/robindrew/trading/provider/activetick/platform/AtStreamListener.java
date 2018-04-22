@@ -24,7 +24,7 @@ public class AtStreamListener extends ActiveTickStreamListener implements Runnab
 
 	private static final Logger log = LoggerFactory.getLogger(AtStreamListener.class);
 
-	private final Map<IInstrument, IInstrumentPriceStream> listenerMap = new ConcurrentHashMap<>();
+	private final Map<IInstrument, IInstrumentPriceStream<IAtInstrument>> listenerMap = new ConcurrentHashMap<>();
 	private final BlockingDeque<AtQuote> quoteQueue = new LinkedBlockingDeque<>();
 	private final Thread thread;
 	private final AtomicBoolean closed = new AtomicBoolean(false);
@@ -61,7 +61,7 @@ public class AtStreamListener extends ActiveTickStreamListener implements Runnab
 		}
 	}
 
-	public void register(IInstrumentPriceStream stream) {
+	public void register(IInstrumentPriceStream<IAtInstrument> stream) {
 		IInstrument instrument = stream.getInstrument();
 		instrument = instrument.getUnderlying(true);
 		listenerMap.put(instrument, stream);
@@ -79,7 +79,7 @@ public class AtStreamListener extends ActiveTickStreamListener implements Runnab
 
 				IInstrument instrument = quote.getInstrument();
 				instrument = instrument.getUnderlying(true);
-				IInstrumentPriceStream priceStream = listenerMap.get(instrument);
+				IInstrumentPriceStream<IAtInstrument> priceStream = listenerMap.get(instrument);
 				if (priceStream != null) {
 					ITickPriceCandle tick = quote.getTick();
 					priceStream.putNextCandle(tick);
