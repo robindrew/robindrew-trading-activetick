@@ -55,7 +55,7 @@ public class AtRequestor extends ActiveTickServerRequester {
 			LocalDateTime openTime = AtHelper.toLocalDateTime(record.barTime);
 			LocalDateTime closeTime = openTime.plusSeconds(59);
 
-			IPriceCandle candle = new MidPriceCandle(open, high, low, close, toMillis(openTime), toMillis(closeTime), 0);
+			IPriceCandle candle = new MidPriceCandle(open, high, low, close, toMillis(openTime), toMillis(closeTime), 0, 0);
 			candles.add(candle);
 		}
 
