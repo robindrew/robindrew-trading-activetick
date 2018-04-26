@@ -6,7 +6,7 @@ import com.robindrew.trading.platform.streaming.StreamingService;
 import com.robindrew.trading.provider.activetick.platform.AtConnection;
 import com.robindrew.trading.provider.activetick.platform.IAtInstrument;
 
-public class AtStreamingService extends StreamingService<IAtInstrument> {
+public class AtStreamingService extends StreamingService<IAtInstrument> implements IAtStreamingService {
 
 	private final AtConnection connection;
 	private final AtomicBoolean closed = new AtomicBoolean(false);
@@ -43,20 +43,4 @@ public class AtStreamingService extends StreamingService<IAtInstrument> {
 		}
 		return false;
 	}
-
-	@Override
-	public boolean isConnected() {
-		return !closed.get() && connection.isConnected();
-	}
-
-	@Override
-	public void connect() {
-		// Nothing to do
-	}
-
-	@Override
-	public void close() {
-		closed.set(true);
-	}
-
 }
