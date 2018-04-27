@@ -5,7 +5,7 @@ import com.robindrew.common.util.Check;
 import at.shared.ATServerAPIDefines;
 import at.shared.ATServerAPIDefines.ATGUID;
 
-public class AtCredentials {
+public class AtCredentials implements IAtCredentials {
 
 	private final String apiKey;
 	private final String username;
@@ -22,18 +22,22 @@ public class AtCredentials {
 		this.guid.SetGuid(apiKey);
 	}
 
+	@Override
 	public String getApiKey() {
 		return apiKey;
 	}
 
+	@Override
 	public String getUsername() {
 		return username;
 	}
 
+	@Override
 	public String getPassword() {
 		return password;
 	}
 
+	@Override
 	public ATGUID getATGUID() {
 		return guid;
 	}
