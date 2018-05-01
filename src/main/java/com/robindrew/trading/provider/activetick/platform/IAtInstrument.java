@@ -1,7 +1,7 @@
 package com.robindrew.trading.provider.activetick.platform;
 
-import com.robindrew.trading.IInstrument;
+import com.robindrew.trading.provider.ITradeDataProviderInstrument;
 
-public interface IAtInstrument extends IInstrument {
+public interface IAtInstrument extends ITradeDataProviderInstrument	 {
 
 }

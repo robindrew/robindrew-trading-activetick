@@ -6,6 +6,8 @@ import java.util.Set;
 import com.robindrew.trading.IInstrument;
 import com.robindrew.trading.Instrument;
 import com.robindrew.trading.Instruments;
+import com.robindrew.trading.provider.ITradeDataProvider;
+import com.robindrew.trading.provider.TradeDataProvider;
 
 public class AtInstrument extends Instrument implements IAtInstrument {
 
@@ -53,6 +55,11 @@ public class AtInstrument extends Instrument implements IAtInstrument {
 
 	public AtInstrument(String name, IInstrument underlying) {
 		super(name, underlying);
+	}
+
+	@Override
+	public ITradeDataProvider getProvider() {
+		return TradeDataProvider.ACTIVETICK;
 	}
 
 }
